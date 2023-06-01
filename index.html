@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+
+    <link rel="stylesheet" href="./public/css/styles.css" type="text/css" />
+
+    <title>My site with maps and database</title>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div id="map" class="map"></div>
+      <form id="newPlaceForm" class="form">
+        <input type="text" name="name" placeholder="Назва" required />
+        <input type="text" name="description" placeholder="Опис" required />
+        <input
+          type="number"
+          name="latitude"
+          placeholder="Широта"
+          step="any"
+          required
+        />
+        <input
+          type="number"
+          name="longitude"
+          placeholder="Довгота"
+          step="any"
+          required
+        />
+        <button type="submit" class="button">Додати</button>
+      </form>
+    </div>
+
+    <script src="./form.js"></script>
+    <script src="./public/js/script.js"></script>
+  </body>
+</html>
