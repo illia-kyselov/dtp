@@ -32,7 +32,6 @@ app.get("/places", (req, res) => {
   });
 });
 
-// Перемістіть цей рядок після оголошення змінної `app`
 app.use(express.static(__dirname + "/"));
 
 app.listen(port, () => {
