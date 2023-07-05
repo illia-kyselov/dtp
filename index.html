@@ -21,28 +21,63 @@
   <body>
     <div class="wrapper">
       <div id="map" class="map"></div>
-      <form id="newPlaceForm" class="form">
-        <input type="text" name="name" placeholder="Назва" required />
-        <input type="text" name="description" placeholder="Опис" required />
-        <input
-          type="number"
-          name="latitude"
-          placeholder="Широта"
-          step="any"
-          required
-        />
-        <input
-          type="number"
-          name="longitude"
-          placeholder="Довгота"
-          step="any"
-          required
-        />
-        <button type="submit" class="button">Додати</button>
-      </form>
+      <div class="container">
+        <form id="newPlaceForm" class="form">
+          <input type="text" name="name" placeholder="Назва" required />
+          <input type="text" name="description" placeholder="Опис" required />
+          <input
+            type="number"
+            name="latitude"
+            placeholder="Широта"
+            step="any"
+            required
+          />
+          <input
+            type="number"
+            name="longitude"
+            placeholder="Довгота"
+            step="any"
+            required
+          />
+          <button type="submit" class="button">Додати</button>
+        </form>
+        <table id="historyTable" class="historyTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Назва</th>
+              <th>Дія</th>
+              <th>Дата та час</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="table-container">
+        <div class="search">
+          <input type="text" id="searchInput" placeholder="Пошук" />
+          <button type="button" id="searchButton" class="button">Пошук</button>
+        </div>
+    
+        <table id="placesTable" class="placesTable">
+          <thead class="head-table">
+            <tr>
+              <th data-sort="id">ID</th>
+              <th data-sort="name">Назва</th>
+              <th data-sort="description">Опис</th>
+              <th data-sort="latitude">Широта</th>
+              <th data-sort="longitude">Довгота</th>
+              <th data-sort="date">Дата</th>
+              <th class="last-column-header"></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
     </div>
 
-    <script src="./public/js/form.js"></script>
+    <script src="./public/js/form1.js"></script>
+    <script src="./public/js/table.js"></script>
     <script src="./public/js/script.js"></script>
   </body>
 </html>

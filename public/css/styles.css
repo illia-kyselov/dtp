@@ -7,16 +7,24 @@ html {
 .wrapper {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-around;
 }
 
+.form-field {
+  display: block;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  outline: none;
+}
+
 .form {
-  width: 400px;
+  max-width: 400px;
   height: 100%;
 
   padding: 25px;
-  margin: 15px;
+  margin-bottom: 15px;
 
   background-color: #f9f9f9;
   border-radius: 5px;
@@ -40,7 +48,13 @@ html {
   outline: none;
 }
 
+.form-marker {
+  margin: 10px;
+  padding: 0;
+}
+
 .form button {
+  display: block;
   padding: 10px 8px;
   border-radius: 5px;
 
@@ -53,6 +67,16 @@ html {
 
 .form button:hover {
   background-color: #45a049;
+}
+
+.button {
+  display: block;
+  padding: 5px;
+  border-radius: 5px;
+  color: #fff;
+  background-color: #4caf50;
+  border: none;
+  cursor: pointer;
 }
 
 input::-webkit-outer-spin-button,
@@ -68,4 +92,104 @@ input::-webkit-inner-spin-button {
 
 .leaflet-marker-icon {
   box-shadow: none !important;
+}
+
+.placesTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.placesTable th,
+.placesTable td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.placesTable tr, th {
+  background-color: #f2f2f2;
+  color: #333;
+}
+
+.placesTable th {
+  position: sticky;
+  white-space: nowrap;
+  top: 40px;
+  z-index: 2;
+}
+
+.placesTable tbody tr:nth-child(even) {
+  background-color: #e6e6e6;
+}
+
+.placesTable th:hover {
+  cursor: pointer;
+  color: #f37575;
+}
+
+th.asc::after {
+  display: inline-block;
+  content: " ▼";
+}
+
+th.desc::after {
+  display: inline-block;
+  content: " ▲";
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  position: sticky;
+  top: 0;
+  background-color: #f9f9f9;
+  z-index: 1;
+  padding: 10px;
+}
+
+.search input[type="text"],
+.search button {
+  margin-left: 5px;
+}
+
+.delete-icon {
+  color: #f37575;
+  cursor: pointer;
+}
+
+.last-column-header {
+  pointer-events: none;
+}
+
+.container {
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.historyTable {
+  border-collapse: collapse;
+}
+
+.historyTable th {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.historyTable tr, th {
+  background-color: #f2f2f2;
+  color: #333;
+}
+
+.historyTable tbody tr:nth-child(even) {
+  background-color: #e6e6e6;
+}
+
+.historyTable th, .historyTable td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd
 }
