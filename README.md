@@ -28,8 +28,8 @@
   );
 
 # Places:
-  1	Guliver	This is Guliver	50.442704	30.521950
-  2	Lviv Opera Theater	This is Lviv Opera Theater	49.841895	24.030327
-  3	Odesa Opera House	This is Odesa Opera Theater	46.484840	30.732355
-  4	Yavoriv National Nature Park	This is Yavoriv National Nature Park	49.938601	23.382255
-  5	Kamianets-Podilskyi fortress	This is Kamianets-Podilskyi fortress	48.671934	26.589493
+  1.	Guliver	This is Guliver	50.442704	30.521950
+  2.	Lviv Opera Theater	This is Lviv Opera Theater	49.841895	24.030327
+  3.	Odesa Opera House	This is Odesa Opera Theater	46.484840	30.732355
+  4.	Yavoriv National Nature Park	This is Yavoriv National Nature Park	49.938601	23.382255
+  5.	Kamianets-Podilskyi fortress	This is Kamianets-Podilskyi fortress	48.671934	26.589493
