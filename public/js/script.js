@@ -11,76 +11,157 @@ fetch("/places")
       maxZoom: 18,
     }).addTo(map);
 
-    var marker;
+    var markers = [];
+    let currentMarker = null;
 
     function addMarkerToMap(event) {
       const { lat, lng } = event.latlng;
 
-      if (marker) {
-        map.removeLayer(marker);
+      if (currentMarker) {
+        map.removeLayer(currentMarker);
       }
 
-      marker = L.marker([lat, lng]).addTo(map);
+      const newMarker = L.marker([lat, lng], {
+        draggable: true,
+        placeId: null,
+      }).addTo(map);
 
-      marker.on("click", function () {
-        const form = document.createElement("form");
-        form.innerHTML = `
-          <input type="text" class="form-field" name="name" placeholder="Назва" required />
-          <input type="text" class="form-field" name="description" placeholder="Опис" required />
-          <input type="number" name="latitude" value="${lat.toFixed(
-            6
-          )}" step="any" hidden />
-          <input type="number" name="longitude" value="${lng.toFixed(
-            6
-          )}" step="any" hidden />
-          <input type="date" name="createdate" value="${new Date().toLocaleDateString()}" hidden/>
-          <button type="submit" class="button">Додати</button>
-        `;
+      const form = document.createElement("form");
+      form.innerHTML = `
+        <input type="text" class="form-field" name="name" placeholder="Назва" required />
+        <input type="text" class="form-field" name="description" placeholder="Опис" required />
+        <input type="number" name="latitude" value="${lat.toFixed(
+          6
+        )}" step="any" hidden />
+        <input type="number" name="longitude" value="${lng.toFixed(
+          6
+        )}" step="any" hidden />
+        <input type="date" name="createdate" value="${new Date().toLocaleDateString()}" hidden/>
+        <button type="submit" class="button">Додати</button>
+      `;
 
-        form.addEventListener("submit", function (event) {
-          event.preventDefault();
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
 
-          const formData = new FormData(form);
-          const place = Object.fromEntries(formData.entries());
+        const formData = new FormData(form);
+        const place = Object.fromEntries(formData.entries());
 
-          addPlaceToTable(place);
+        addPlaceToTable(place);
 
-          fetch("/places", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(place),
-          })
-            .then(function (response) {
-              if (response.ok) {
-                return response.json();
-              }
-              throw new Error("Error adding place");
-            })
-            .then(function (data) {
-              console.log(data);
-              location.reload();
-            })
-            .catch(function (error) {
-              console.error("An error occurred:", error);
-            });
+        if (place.id) {
+          updateMarkerCoordinates(place.id, lat, lng);
+        } else {
+          addMarkerToDatabase(place, lat, lng);
+        }
 
-          map.closePopup();
-          map.removeLayer(marker);
-          marker = null;
-        });
-
-        marker.bindPopup(form).openPopup();
+        map.closePopup();
       });
+
+      newMarker.bindPopup(form).openPopup();
+
+      newMarker.on("dragend", function (event) {
+        const { lat, lng } = event.target.getLatLng();
+        const placeId = event.target.options.placeId;
+
+        if (placeId) {
+          updateMarkerCoordinates(placeId, lat, lng);
+        } else {
+          newMarker.options.latitude = lat;
+          newMarker.options.longitude = lng;
+        }
+      });
+
+      markers.push(newMarker);
+
+      currentMarker = newMarker;
     }
 
     map.on("click", addMarkerToMap);
 
     places.forEach(function (place) {
-      var marker = L.marker([place.latitude, place.longitude]).addTo(map);
+      var marker = L.marker([place.latitude, place.longitude], {
+        placeId: place.id,
+        draggable: true,
+      }).addTo(map);
       marker.bindPopup("<b>" + place.name + "</b><br>" + place.description);
+
+      marker.on("dragend", function (event) {
+        const { lat, lng } = event.target.getLatLng();
+        const placeId = event.target.options.placeId;
+        updateMarkerCoordinates(placeId, lat, lng);
+      });
+
+      markers.push(marker);
     });
+
+    function updateMarkerCoordinates(placeId, newLatitude, newLongitude) {
+      const updateData = {
+        latitude: newLatitude,
+        longitude: newLongitude,
+      };
+
+      fetch(`/places/${placeId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updateData),
+      })
+        .then(function (response) {
+          if (response.ok) {
+            return response.json();
+          }
+          throw new Error("Error updating marker coordinates");
+        })
+        .then(function (data) {
+          console.log(data);
+          const place = places.find((p) => p.id === placeId);
+          if (place) {
+            updateHistory(place.name);
+          }
+          location.reload();
+        })
+        .catch(function (error) {
+          console.error("An error occurred:", error);
+        });
+    }
+
+    function updateHistory(name) {
+      const updateData = {
+        name: name,
+        action: "Updated",
+        timestamp: new Date().toLocaleString("uk-UA", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: false,
+          timeZone: "Europe/Kiev",
+        }),
+      };
+
+      fetch(`/history`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updateData),
+      })
+        .then(function (response) {
+          if (response.ok) {
+            return response.json();
+          }
+          throw new Error("Error updating history");
+        })
+        .then(function (data) {
+          console.log(data);
+        })
+        .catch(function (error) {
+          console.error("An error occurred:", error);
+        });
+    }
   })
   .catch(function (error) {
     console.error("An error occurred:", error);
@@ -235,36 +316,28 @@ function addEventToHistoryTable(event) {
   historyTableBody.appendChild(row);
 }
 
-function addEventToHistory(id, name, action) {
-  const event = {
-    id: id,
-    name: name,
-    action: action,
-    timestamp: new Date().toLocaleDateString("uk-UA", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-      timeZone: "Europe/Kiev",
-    }),
-  };
-
-  addEventToHistoryTable(event);
-
-  fetch("/history", {
+function addMarkerToDatabase(place, latitude, longitude) {
+  fetch("/places", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(event),
+    body: JSON.stringify({
+      name: place.name,
+      description: place.description,
+      latitude: latitude,
+      longitude: longitude,
+    }),
   })
     .then(function (response) {
-      if (!response.ok) {
-        throw new Error("Error adding event");
+      if (response.ok) {
+        return response.json();
       }
+      throw new Error("Error adding place");
+    })
+    .then(function (data) {
+      console.log(data);
+      location.reload();
     })
     .catch(function (error) {
       console.error("An error occurred:", error);

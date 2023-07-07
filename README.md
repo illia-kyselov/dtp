@@ -33,3 +33,7 @@
   3.	Odesa Opera House	This is Odesa Opera Theater	46.484840	30.732355
   4.	Yavoriv National Nature Park	This is Yavoriv National Nature Park	49.938601	23.382255
   5.	Kamianets-Podilskyi fortress	This is Kamianets-Podilskyi fortress	48.671934	26.589493
+
+
+# Delete all from DB history:
+DELETE FROM history WHERE action = 'Created' OR action = 'Deleted' OR action = 'Updated';

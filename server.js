@@ -107,24 +107,6 @@ app.get("/history", (req, res) => {
   });
 });
 
-app.post("/history", (req, res) => {
-  const { id, name, action, timestamp } = req.body;
-
-  const query =
-    "INSERT INTO history (id, name, action, timestamp) VALUES ($1, $2, $3, $4)";
-  const values = [id, name, action, timestamp];
-
-  client.query(query, values, (err) => {
-    if (err) {
-      console.error(err);
-      res.status(500).json({ error: "An error occurred" });
-      return;
-    }
-
-    res.sendStatus(200);
-  });
-});
-
 app.delete("/places/:id", (req, res) => {
   const placeId = req.params.id;
   const query = "DELETE FROM places WHERE id = $1 RETURNING *";
@@ -163,6 +145,43 @@ app.delete("/places/:id", (req, res) => {
     });
 
     res.sendStatus(204);
+  });
+});
+
+app.put("/places/:id", (req, res) => {
+  const placeId = req.params.id;
+  const { latitude, longitude } = req.body;
+
+  const query = "UPDATE places SET latitude = $1, longitude = $2 WHERE id = $3";
+  const values = [latitude, longitude, placeId];
+
+  client.query(query, values, (err, result) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ error: "An error occurred" });
+      return;
+    }
+
+    res.json({ message: "Marker coordinates updated" });
+  });
+});
+
+app.post("/history", (req, res) => {
+  const { name, action, timestamp } = req.body;
+
+  const query =
+    "INSERT INTO history (name, action, timestamp) VALUES ($1, $2, $3) RETURNING *";
+  const values = [name, action, timestamp];
+
+  client.query(query, values, (err, result) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ error: "An error occurred" });
+      return;
+    }
+
+    const newEvent = result.rows[0];
+    res.json(newEvent);
   });
 });
 

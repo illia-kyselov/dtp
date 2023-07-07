@@ -20,7 +20,10 @@
   </head>
   <body>
     <div class="wrapper">
-      <div id="map" class="map"></div>
+      <div id="mapContainer" class="mapContainer">
+        <div id="map" class="map"></div>
+      </div>
+
       <div class="container">
         <form id="newPlaceForm" class="form">
           <input type="text" name="name" placeholder="Назва" required />
@@ -75,7 +78,8 @@
           <tbody></tbody>
         </table>
     </div>
-
+    
+    <script src="./public/js/map.js"></script>
     <script src="./public/js/form1.js"></script>
     <script src="./public/js/table.js"></script>
     <script src="./public/js/script.js"></script>
