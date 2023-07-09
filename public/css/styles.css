@@ -23,7 +23,7 @@ html {
   max-width: 400px;
   height: 100%;
 
-  padding: 25px;
+  padding: 25px 25px 0;
   margin-bottom: 15px;
 
   background-color: #f9f9f9;
@@ -106,7 +106,8 @@ input::-webkit-inner-spin-button {
   border-bottom: 1px solid #ddd;
 }
 
-.placesTable tr, th {
+.placesTable tr,
+th {
   background-color: #f2f2f2;
   color: #333;
 }
@@ -179,7 +180,8 @@ th.desc::after {
   border-bottom: 1px solid #ddd;
 }
 
-.historyTable tr, th {
+.historyTable tr,
+th {
   background-color: #f2f2f2;
   color: #333;
 }
@@ -188,16 +190,71 @@ th.desc::after {
   background-color: #e6e6e6;
 }
 
-.historyTable th, .historyTable td {
+.historyTable th,
+.historyTable td {
   padding: 10px;
   text-align: left;
-  border-bottom: 1px solid #ddd
+  border-bottom: 1px solid #ddd;
+  max-height: 40px;
 }
 
-/* .mapContainer {
+:root {
+  --monitor-width: 100vw;
+  --monitor-height: 100vh;
+}
+
+#mapContainer {
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 20px;
+  left: calc(100% - 20px - 1800px);
+  width: var(--monitor-width);
+  height: var(--monitor-height);
+  overflow: auto;
+  resize: both;
+}
+
+.map {
   width: 100%;
   height: 100%;
-} */
+}
+
+.form {
+  display: block;
+  position: absolute;
+  top: 20px;
+  left: 800px;
+  width: 300px;
+  height: 200px;
+  overflow: auto;
+  resize: both;
+}
+
+.historyTable {
+  height: 100%;
+  width: 100%;
+}
+
+.history-container {
+  position: absolute;
+  top: 300px;
+  left: 800px;
+  resize: both;
+  overflow: auto;
+}
+
+.table-container {
+  position: absolute;
+  top: 20px;
+  left: calc(100% - 20px - 600px);
+  resize: both;
+  overflow: auto;
+}
+
+.resize-handle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  bottom: 0;
+  right: 0;
+  cursor: se-resize;
+}

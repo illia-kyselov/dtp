@@ -17,7 +17,7 @@
     description TEXT,
     latitude FLOAT,
     longitude FLOAT,
-    "Date" TIMESTAMP DEFAULT current_timestamp
+    createdate TIMESTAMP DEFAULT current_timestamp
   );
 
   CREATE TABLE history (

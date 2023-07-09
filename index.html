@@ -20,12 +20,12 @@
   </head>
   <body>
     <div class="wrapper">
-      <div id="mapContainer" class="mapContainer">
+      <div id="mapContainer" class="mapContainer" >
         <div id="map" class="map"></div>
       </div>
 
       <div class="container">
-        <form id="newPlaceForm" class="form">
+        <form id="newPlaceForm" class="form" >
           <input type="text" name="name" placeholder="Назва" required />
           <input type="text" name="description" placeholder="Опис" required />
           <input
@@ -44,20 +44,22 @@
           />
           <button type="submit" class="button">Додати</button>
         </form>
-        <table id="historyTable" class="historyTable">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Назва</th>
-              <th>Дія</th>
-              <th>Дата та час</th>
-            </tr>
-          </thead>
-          <tbody id="historyTableBody"></tbody>
-        </table>
+        <div class="history-container" id="history-container" >
+          <table id="historyTable" class="historyTable" >
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Назва</th>
+                <th>Дія</th>
+                <th>Дата та час</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody"></tbody>
+          </table>
+        </div>
       </div>
 
-      <div class="table-container">
+      <div class="table-container" id="tableContainer" >
         <div class="search">
           <input type="text" id="searchInput" placeholder="Пошук" />
           <button type="button" id="searchButton" class="button">Пошук</button>
@@ -78,10 +80,12 @@
           <tbody></tbody>
         </table>
     </div>
-    
-    <script src="./public/js/map.js"></script>
+    <script src="./public/js/move.js"></script>
     <script src="./public/js/form1.js"></script>
     <script src="./public/js/table.js"></script>
+    <script src="./public/js/resize.js"></script>
+    <script src="./public/js/saveParams.js"></script>
     <script src="./public/js/script.js"></script>
+
   </body>
 </html>
