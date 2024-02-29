@@ -60,66 +60,26 @@
     });
 
     var baseLayers = {
-      // "ArcGIS Layer": arcgisLayer,
-      // "OSM Layer": osmLayer,
+      "Поперчний профіль": layer3,
+      "Просторове представлення межі дороги": layer2,
     };
 
-    var layerControl = L.control.layers(baseLayers, null, { collapsed: false });
+    var overlayMaps = {
+      "OSM Layer": osmLayer,
+      "ArcGIS Layer": arcgisLayer,
+      "100.000": layer1,
+    };
+
+    var layerControl = L.control.layers(overlayMaps, baseLayers, {
+      collapsed: true,
+      baseLayersTitle: 'Base Layers', 
+      overlayLayersTitle: 'Overlay Maps',
+    });
     layerControl.addTo(map);
 
+
     var container = layerControl.getContainer();
-
-    container.innerHTML += '<div><label><input type="checkbox" id="layer1Checkbox" > Мапа України 1:100 000 </label></div>';
-    container.innerHTML += '<div><label><input type="checkbox" id="layer2Checkbox" > Просторове представлення межі дороги </label></div>';
-    container.innerHTML += '<div><label><input type="checkbox" id="layer3Checkbox" > Поперчний профіль </label></div>';
-
-    container.innerHTML += '<div><select id="layerSelector" onchange="changeLayer()">' +
-      '<option value="arcgis">ArcGIS</option>' +
-      '<option value="osm">OSM</option>' +
-      '</select></div>';
-
-    map.addLayer(arcgisLayer);
-
-    document.getElementById('layer1Checkbox').addEventListener('change', function () {
-      if (this.checked) {
-        map.addLayer(layer1);
-      } else {
-        map.removeLayer(layer1);
-      }
-    });
-
-    document.getElementById('layer2Checkbox').addEventListener('change', function () {
-      if (this.checked) {
-        map.addLayer(layer2);
-      } else {
-        map.removeLayer(layer2);
-      }
-    });
-
-    document.getElementById('layer3Checkbox').addEventListener('change', function () {
-      if (this.checked) {
-        map.addLayer(layer3);
-      } else {
-        map.removeLayer(layer3);
-      }
-    });
-
-    function changeLayer() {
-      var selectedLayer = document.getElementById('layerSelector').value;
-      if (selectedLayer === 'arcgis') {
-        map.addLayer(arcgisLayer);
-        map.removeLayer(osmLayer);
-        document.getElementById('layer1Checkbox').checked = false;
-        document.getElementById('layer2Checkbox').checked = false;
-        document.getElementById('layer3Checkbox').checked = false;
-      } else if (selectedLayer === 'osm') {
-        map.addLayer(osmLayer);
-        map.removeLayer(arcgisLayer);
-        document.getElementById('layer1Checkbox').checked = false;
-        document.getElementById('layer2Checkbox').checked = false;
-        document.getElementById('layer3Checkbox').checked = false;
-      }
-    }
+    map.addLayer(osmLayer);
   </script>
 </body>
 
