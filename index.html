@@ -1,91 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/proj4/dist/proj4.js"></script>
+  <script src="https://unpkg.com/proj4leaflet/src/proj4leaflet.js"></script>
+  <title>Map with TSM</title>
+  <style>
+    #map {
+      height: 98vh;
+      width: 99vw;
+    }
 
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""
-    />
+    .layer-control {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: white;
+      padding: 5px;
+      border-radius: 5px;
+      z-index: 1000;
+    }
+  </style>
+</head>
 
-    <link rel="stylesheet" href="./public/css/styles.css" type="text/css" />
+<body style="background-color: #1a1a1a;">
+  <div id="map"></div>
+  <div class="layer-control" id="layerControl"></div>
 
-    <title>My site with maps and database</title>
-  </head>
-  <body>
-    <div class="wrapper">
-      <div id="mapContainer" class="mapContainer" >
-        <div id="map" class="map"></div>
-      </div>
+  <script>
+    var map = L.map('map').setView([50.4501, 30.5234], 12);
 
-      <div class="container">
-        <form id="newPlaceForm" class="form" >
-          <input type="text" name="name" placeholder="Назва" required />
-          <input type="text" name="description" placeholder="Опис" required />
-          <input
-            type="number"
-            name="latitude"
-            placeholder="Широта"
-            step="any"
-            required
-          />
-          <input
-            type="number"
-            name="longitude"
-            placeholder="Довгота"
-            step="any"
-            required
-          />
-          <button type="submit" class="button">Додати</button>
-        </form>
-        <div class="history-container" id="history-container" >
-          <table id="historyTable" class="historyTable" >
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Назва</th>
-                <th>Дія</th>
-                <th>Дата та час</th>
-              </tr>
-            </thead>
-            <tbody id="historyTableBody"></tbody>
-          </table>
-        </div>
-      </div>
+    var arcgisLayer = L.tileLayer('https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png', {
+      maxZoom: 18,
+      attribution: 'Map data: © OpenStreetMap contributors'
+    });
 
-      <div class="table-container" id="tableContainer" >
-        <div class="search">
-          <input type="text" id="searchInput" placeholder="Пошук" />
-          <button type="button" id="searchButton" class="button">Пошук</button>
-        </div>
-    
-        <table id="placesTable" class="placesTable">
-          <thead class="head-table">
-            <tr>
-              <th data-sort="id">ID</th>
-              <th data-sort="name">Назва</th>
-              <th data-sort="description">Опис</th>
-              <th data-sort="latitude">Широта</th>
-              <th data-sort="longitude">Довгота</th>
-              <th data-sort="date">Дата</th>
-              <th class="last-column-header"></th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-    </div>
-    <script src="./public/js/move.js"></script>
-    <script src="./public/js/form1.js"></script>
-    <script src="./public/js/table.js"></script>
-    <script src="./public/js/resize.js"></script>
-    <script src="./public/js/saveParams.js"></script>
-    <script src="./public/js/script.js"></script>
+    var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: 'Map data: © OpenStreetMap contributors'
+    });
 
-  </body>
+    var layer1 = L.tileLayer('http://192.168.1.5:3001/map/rtile/carto_3095100847655224519/ua/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: 'Map data: © МІСЬКА СХЕМА ОРГАНІЗАЦІЇ ДОРОЖНЬОГО РУХУ'
+    });
+
+    var layer2 = L.tileLayer('http://192.168.1.5:3001/map/rtile/carto_3311781629541746007/ua/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: 'Map data: © МІСЬКА СХЕМА ОРГАНІЗАЦІЇ ДОРОЖНЬОГО РУХУ'
+    });
+
+    var layer3 = L.tileLayer('http://192.168.1.5:3001/map/rtile/carto_3311785568152585577/ua/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: 'Map data: © МІСЬКА СХЕМА ОРГАНІЗАЦІЇ ДОРОЖНЬОГО РУХУ'
+    });
+
+    var baseLayers = {
+      // "ArcGIS Layer": arcgisLayer,
+      // "OSM Layer": osmLayer,
+    };
+
+    var layerControl = L.control.layers(baseLayers, null, { collapsed: false });
+    layerControl.addTo(map);
+
+    var container = layerControl.getContainer();
+
+    container.innerHTML += '<div><label><input type="checkbox" id="layer1Checkbox" > Мапа України 1:100 000 </label></div>';
+    container.innerHTML += '<div><label><input type="checkbox" id="layer2Checkbox" > Просторове представлення межі дороги </label></div>';
+    container.innerHTML += '<div><label><input type="checkbox" id="layer3Checkbox" > Поперчний профіль </label></div>';
+
+    container.innerHTML += '<div><select id="layerSelector" onchange="changeLayer()">' +
+      '<option value="arcgis">ArcGIS</option>' +
+      '<option value="osm">OSM</option>' +
+      '</select></div>';
+
+    map.addLayer(arcgisLayer);
+
+    document.getElementById('layer1Checkbox').addEventListener('change', function () {
+      if (this.checked) {
+        map.addLayer(layer1);
+      } else {
+        map.removeLayer(layer1);
+      }
+    });
+
+    document.getElementById('layer2Checkbox').addEventListener('change', function () {
+      if (this.checked) {
+        map.addLayer(layer2);
+      } else {
+        map.removeLayer(layer2);
+      }
+    });
+
+    document.getElementById('layer3Checkbox').addEventListener('change', function () {
+      if (this.checked) {
+        map.addLayer(layer3);
+      } else {
+        map.removeLayer(layer3);
+      }
+    });
+
+    function changeLayer() {
+      var selectedLayer = document.getElementById('layerSelector').value;
+      if (selectedLayer === 'arcgis') {
+        map.addLayer(arcgisLayer);
+        map.removeLayer(osmLayer);
+        document.getElementById('layer1Checkbox').checked = false;
+        document.getElementById('layer2Checkbox').checked = false;
+        document.getElementById('layer3Checkbox').checked = false;
+      } else if (selectedLayer === 'osm') {
+        map.addLayer(osmLayer);
+        map.removeLayer(arcgisLayer);
+        document.getElementById('layer1Checkbox').checked = false;
+        document.getElementById('layer2Checkbox').checked = false;
+        document.getElementById('layer3Checkbox').checked = false;
+      }
+    }
+  </script>
+</body>
+
 </html>
