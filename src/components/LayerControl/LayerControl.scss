@@ -1,0 +1,9 @@
+.leaflet-control-layers label {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  background: white;
+  padding: 2px;
+  border-radius: 5px;
+  z-index: 1000;
+}
