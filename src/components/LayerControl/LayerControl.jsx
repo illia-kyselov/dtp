@@ -1,6 +1,6 @@
 import React from 'react';
 import L from 'leaflet';
-import { TileLayer, useMap, LayersControl } from 'react-leaflet';
+import { TileLayer, WMSTileLayer, useMap, LayersControl } from 'react-leaflet';
 
 import 'leaflet/dist/leaflet.css';
 import './LayerControl.scss';
@@ -54,6 +54,15 @@ const LayerControl = () => {
           <TileLayer
             url="http://192.168.1.5:3001/map/rtile/carto_3311785568152585577/ua/{z}/{x}/{y}.png"
             attribution='Map data: © МІСЬКА СХЕМА ОРГАНІЗАЦІЇ ДОРОЖНЬОГО РУХУ'
+          />
+        </LayersControl.Overlay>
+        <LayersControl.Overlay name="WMS Layer">
+          <WMSTileLayer
+            layers="JorgeAlv:TEST"
+            url="https://wms.prod.qgiscloud.com/ProcemSIG/Capturas_Mosca_semana_28/"
+            format="image/png"
+            transparent={true}
+            attribution='Map data: © QGIS Cloud'
           />
         </LayersControl.Overlay>
       </LayersControl>
