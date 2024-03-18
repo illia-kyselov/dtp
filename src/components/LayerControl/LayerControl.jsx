@@ -4,8 +4,9 @@ import { TileLayer, WMSTileLayer, useMap, LayersControl } from 'react-leaflet';
 
 import 'leaflet/dist/leaflet.css';
 import './LayerControl.scss';
+import { InfoWMSTileLayer } from 'react-leaflet-infowms';
 
-const LayerControl = () => {
+const LayerControl = ({ setFeatures }) => {
   const map = useMap();
 
   const onLayerChange = (event) => {
@@ -18,7 +19,62 @@ const LayerControl = () => {
     });
     selectedLayer.addTo(map);
   };
+
+  // const onWMSLayerClick = async (event) => {
+  //   console.log("WMS layer clicked", event);
+  //   const { latlng } = event;
+  //   console.log("Clicked at", latlng);
+  //   const layers = map?.layers || [];
+  //   console.log("Map layers", layers);
+
+  //   const wmsLayer = layers.find(layer => layer instanceof WMSTileLayer);
+  //   console.log(wmsLayer)
+  //   if (wmsLayer) {
+  //     const { data } = await wmsLayer.getFeatureInfo(latlng, {
+  //       info_format: 'text/html',
+  //     });
+
+  //     handleHTMLResponse(data);
+  //   }
+  // };
+
+  // const handleHTMLResponse = (htmlData) => {
+  //   console.log(htmlData); 
+  // };
+
+  function wmsInfo(event) {
+    console.log('Наш запит', event)
+    fetch(event.url)
+      .then((response) => response.json())
+      .then((response) => {
+        console.log('Відповідь сервера', response)
+        setFeatures(response.features)
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
+  }
   
+
+  // function wmsInfo(e) {
+  //   console.log('Наш запит', e)
+  //   fetch('http://qgiss.local/?SERVICE=WMTS&REQUEST=GetFeatureInfo&MAP=/home/qgis/projects/world.qgs&LAYER=register_rdsign&INFOFORMAT=text/html', { mode: 'no-cors' })
+  //     .then((response) => response.text())
+  //     .then((response) => {
+  //       console.log('Відповідь сервера', response)
+  //       setFeatures(response.features);
+  //     })
+  // }
+
+  // function wmsInfo(event) {
+  //   console.log(event)
+  //   fetch('http://qgiss.local/?SERVICE=WMTS&REQUEST=GetFeatureInfo&MAP=/home/qgis/projects/world.qgs&LAYER=register_rdsign&INFOFORMAT=text/html', { mode: 'no-cors' })
+  //     .then((response) => response.json())
+  //     .then((response) => {
+  //       console.log(response)
+  //     })
+  // }
+    
   return (
     <div className="layer-control">
       <LayersControl position="topright" onLayerChange={onLayerChange}>
@@ -28,7 +84,7 @@ const LayerControl = () => {
             attribution='Map data: © OpenStreetMap contributors'
           />
         </LayersControl.BaseLayer>
-{/* 
+
         <LayersControl.BaseLayer name="ArcGIS Layer">
           <TileLayer
             url="https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png"
@@ -43,7 +99,7 @@ const LayerControl = () => {
           />
         </LayersControl.BaseLayer>
 
-        <LayersControl.Overlay name="Просторове представлення межі дороги">
+        {/* <LayersControl.Overlay name="Просторове представлення межі дороги">
           <TileLayer
             url="http://192.168.1.5:3001/map/rtile/carto_3311781629541746007/ua/{z}/{x}/{y}.png"
             attribution='Map data: © МІСЬКА СХЕМА ОРГАНІЗАЦІЇ ДОРОЖНЬОГО РУХУ'
@@ -82,10 +138,10 @@ const LayerControl = () => {
             attribution='Map data: © QGIS Cloud'
           />
         </LayersControl.Overlay> */}
-        <LayersControl.Overlay name="WMS TEST">
+        <LayersControl.Overlay name="WMS TEST_roads">
           <WMSTileLayer
-            layers="rus3857"
-            url="http://local.mapserv/cgi-bin/mapserv?map=/var/www/mapsrv/maps/rus3857.map&layer=rus3857"
+            layers="cross_prof"
+            url="http://mapss.local/cgi-bin/mapserv?map=/var/www/mapsrv/maps/roads.map&layer=cross_prof"
             format="image/png"
             transparent={true}
             attribution='Map data: © QGIS Cloud'
@@ -99,6 +155,83 @@ const LayerControl = () => {
             format="image/png"
             transparent={true}
             attribution='Map data: © QGIS Cloud'
+          />
+        </LayersControl.Overlay>
+        <LayersControl.Overlay name="WMS board_obj">
+          <WMSTileLayer
+            layers="board_obj"
+            url="http://mapss.local/cgi-bin/mapserv?map=/var/www/mapsrv/maps/roads.map&layer=board_obj"
+            format="image/png"
+            transparent={true}
+            attribution='Map data: © QGIS Cloud'
+            maxZoom={20}
+          />
+        </LayersControl.Overlay>
+        <LayersControl.Overlay name="new road test">
+          <WMSTileLayer
+            layers="road_models_coord"
+            url="http://mapss.local/cgi-bin/mapserv?map=/var/www/mapsrv/maps/roads.map&layer=road_models_coord"
+            format="image/png"
+            transparent={true}
+            attribution='Map data: © QGIS Cloud'
+            maxZoom={20}
+          />
+        </LayersControl.Overlay>
+        <LayersControl.Overlay name="QGIS.S register_rdsign">
+          <InfoWMSTileLayer
+            url="http://qgiss.local/cgi-bin/qgis_mapserv.fcgi?MAP=/home/qgis/projects/profilo.qgs"
+            params={{
+              layers: "register_rdsign",
+              format: 'image/png',
+              transparent: true,
+              attribution: 'Map data: © QGIS Cloud',
+              maxZoom: 20,
+              feature_count: 1,
+            }}
+            eventHandlers={{ click: (event) => wmsInfo(event) }}
+          />
+        </LayersControl.Overlay>
+        {/* <LayersControl.Overlay name="QGIS.S road_models_coord.geom">
+          <WMSTileLayer
+            layers="road_models_coord.geom"            
+            url="http://qgiss.local/cgi-bin/qgis_mapserv.fcgi?MAP=/home/qgis/projects/profilo.qgs"
+            format="image/png"
+            transparent={true}
+            attribution='Map data: © QGIS Cloud'
+            maxZoom={20}
+          />
+        </LayersControl.Overlay>
+        <LayersControl.Overlay name="QGIS.S cross_prof_obj.geom_wgs">
+          <WMSTileLayer
+            layers="cross_prof_obj.geom_wgs"
+            url="http://qgiss.local/cgi-bin/qgis_mapserv.fcgi?MAP=/home/qgis/projects/profilo.qgs"
+            format="image/png"
+            transparent={true}
+            attribution='Map data: © QGIS Cloud'
+            maxZoom={20}
+          />
+        </LayersControl.Overlay>
+        <LayersControl.Overlay name="QGIS.S board_road_obj.geom_wgs">
+          <WMSTileLayer
+            layers="board_road_obj.geom_wgs"
+            url="http://qgiss.local/cgi-bin/qgis_mapserv.fcgi?MAP=/home/qgis/projects/profilo.qgs"
+            format="image/png"
+            transparent={true}
+            attribution='Map data: © QGIS Cloud'
+            maxZoom={20}
+          />
+        </LayersControl.Overlay> */}
+        <LayersControl.Overlay name="TEST WMS DATA">
+          <InfoWMSTileLayer
+            url='https://public-mapservice.lf.goteborg.se/geoserver/LF_Externwebb/wms?'
+            params={{
+              layers: 'Utrustning',
+              format: 'image/png',
+              transparent: true,
+              attribution: 'Public Geoserver LF Goteborg City',
+              feature_count: 1,
+            }}
+            eventHandlers={{ click: (event) => wmsInfo(event) }}
           />
         </LayersControl.Overlay>
       </LayersControl>
