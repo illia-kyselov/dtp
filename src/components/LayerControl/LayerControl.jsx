@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect, version } from 'react';
 import L from 'leaflet';
 import { TileLayer, WMSTileLayer, useMap, LayersControl } from 'react-leaflet';
+import { GeoJSON } from 'react-leaflet';
 
 import 'leaflet/dist/leaflet.css';
 import './LayerControl.scss';
@@ -8,7 +9,6 @@ import { InfoWMSTileLayer } from 'react-leaflet-infowms';
 
 const LayerControl = ({ setFeatures }) => {
   const map = useMap();
-
   const onLayerChange = (event) => {
     const selectedLayer = event.layer;
 
@@ -42,19 +42,195 @@ const LayerControl = ({ setFeatures }) => {
   //   console.log(htmlData); 
   // };
 
-  function wmsInfo(event) {
-    console.log('Наш запит', event)
-    fetch(event.url)
-      .then((response) => response.json())
-      .then((response) => {
-        console.log('Відповідь сервера', response)
-        setFeatures(response.features)
-      })
-      .catch((error) => {
-        console.error('Error fetching data:', error);
-      });
-  }
+// 1.3.0
+
+/*
+
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, version"
+</IfModule>
+
+*/
+
+// function wmsInfo(event) {
+//   console.log('Наш запит', event);
+//   fetch(event.url)
+//     .then((response) => response.json())
+//     .then(console.log(event.url))
+//     .then((response) => {
+//       console.log('Відповідь сервера', response);
+//       setFeatures(response.features);
+//     })
+//     .catch((error) => {
+//       console.error('Error fetching data:', error);
+//     });
+// }
+
+function buildUrl(baseUrl, params) {
+  const queryString = Object.keys(params)
+    .map(key => `${key.toUpperCase()}=${encodeURIComponent(params[key])}`)
+    .join('&');
+  return `${baseUrl}?${queryString}`;
+}
+
+// function wmsInfo(event) {
+//   console.log('прошлая ссылка', event.url);
+//   console.log(event)
+  const baseUrl = 'http://qgiss.local/cgi-bin/qgis_mapserv.fcgi';
+//   const bboxArray = event.params.bbox.split(",").map(parseFloat);
+//   const minLng = bboxArray[0];
+//   const minLat = bboxArray[1];
+//   const maxLng = bboxArray[2];
+//   const maxLat = bboxArray[3];
   
+//   const min = L.CRS.EPSG3857.project(L.latLng(minLat, minLng));
+//   const max = L.CRS.EPSG3857.project(L.latLng(maxLat, maxLng));
+  
+//   const bboxEPSG3857 = `${min.x},${min.y},${max.x},${max.y}`;
+//   const params = {
+//     MAP: '/home/qgis/projects/profilo.qgs',
+//     SERVICE: event.params.service,
+//     VERSION: "1.3.0",
+//     REQUEST: event.params.request,
+//     BBOX: bboxEPSG3857,
+//     CRS: 'EPSG:3857',
+//     WIDTH: event.params.width,
+//     HEIGHT: event.params.height,
+//     LAYERS: event.params.layers,
+//     STYLES: event.params.styles,
+//     FORMAT: event.params.format,
+//     QUERY_LAYERS: event.params.query_layers,
+//     INFO_FORMAT: 'text/html',
+//     I: event.params.x,
+//     J: event.params.y
+//   };
+
+//   const newUrlString = buildUrl(baseUrl, params);
+//   console.log('новая ссылка', newUrlString);
+
+//   fetch(newUrlString)
+//     .then((response) => response.text())
+//     .then((response) => {
+//       console.log('Відповідь сервера', response);
+//       setFeatures(response);
+//     })
+//     .catch((error) => {
+//       console.error('Error fetching data:', error);
+//     });
+// }
+
+function wmsInfo(event) {
+  console.log('Наш запит', event);
+  console.log('прошлая ссылка', event.url);
+  // const newUrlString = modifyUrl(event.url);
+  // const newUrlString=rebuildUrlWithParams(event.url);
+  // console.log('новая ссылка',newUrlString);
+
+  const bboxArray = event.params.bbox.split(",").map(parseFloat);
+  const minLng = bboxArray[0];
+  const minLat = bboxArray[1];
+  const maxLng = bboxArray[2];
+  const maxLat = bboxArray[3];
+  
+  const min = L.CRS.EPSG3857.project(L.latLng(minLat, minLng));
+  const max = L.CRS.EPSG3857.project(L.latLng(maxLat, maxLng));
+  
+  const bboxEPSG3857 = `${min.x},${min.y},${max.x},${max.y}`;
+  const params = {
+        MAP: '/home/qgis/projects/profilo.qgs',
+        SERVICE: event.params.service,
+        VERSION: "1.3.0",
+        REQUEST: event.params.request,
+        BBOX: bboxEPSG3857,
+        CRS: 'EPSG:3857',
+        WIDTH: event.params.width,
+        HEIGHT: event.params.height,
+        LAYERS: event.params.layers,
+        STYLES: event.params.styles,
+        FORMAT: event.params.format,
+        QUERY_LAYERS: event.params.query_layers,
+        INFO_FORMAT: 'text/html',
+        I: event.params.x,
+        J: event.params.y
+      };
+      const newUrlString = buildUrl(baseUrl, params);
+  fetch(newUrlString, params)
+    .then((response) => response.json())
+    .then((response) => {
+      console.log('Відповідь сервера', response);
+      setFeatures(response.features);
+    })
+    .catch((error) => {
+      console.error('Error fetching data:', error);
+    });
+}
+
+// function rebuildUrlWithParams(url) {
+//   const parsedUrl = new URL(url);
+//   const params = new URLSearchParams(parsedUrl.search);
+
+//   const orderedParams = new URLSearchParams();
+//   orderedParams.set('SERVICE', params.get('service'));
+//   orderedParams.set('VERSION', params.get('version'));
+//   orderedParams.set('REQUEST', params.get('request'));
+//   orderedParams.set('BBOX', params.get('bbox'));
+//   orderedParams.set('CRS', params.get('srs'));
+//   orderedParams.set('WIDTH', params.get('width'));
+//   orderedParams.set('HEIGHT', params.get('height'));
+//   orderedParams.set('LAYERS', params.get('layers'));
+//   orderedParams.set('STYLES', params.get('styles'));
+//   orderedParams.set('FORMAT', params.get('format'));
+//   orderedParams.set('QUERY_LAYERS', params.get('query_layers'));
+//   orderedParams.set('INFO_FORMAT', params.get('info_format'));
+//   orderedParams.set('I', params.get('x'));
+//   orderedParams.set('J', params.get('y'));
+
+//   const rebuiltUrl = `${parsedUrl.origin}${parsedUrl.pathname}?${orderedParams.toString()}`;
+  
+//   return rebuiltUrl;
+// }
+
+// function modifyUrl(urlString) {
+//   const url = new URL(urlString);
+//   const currentVersion = url.searchParams.get("version");
+//   if (currentVersion && currentVersion.toUpperCase() === "1.1.1") {
+//     url.searchParams.set("VERSION", "1.3.0");
+//   }
+//   return url.toString();
+// }
+
+// function modifyUrl(urlString) {
+//   const url = new URL(urlString);
+//   url.searchParams.delete("version");
+//   return url.toString();
+// }
+
+//   function wmsInfo(event) {
+//     console.log('Наш запит', event);
+
+//     const requestOptions = {
+//         method: 'GET',
+//         headers: {
+//             'Accept': 'application/json',
+//             'Content-Type': 'application/json',
+//             'X-WMS-Version': '1.3.0'
+//         },
+//         mode: 'cors',
+//         cache: 'default'
+//     };
+
+//     fetch(event.url, requestOptions)
+//       .then((response) => response.json())
+//       .then((response) => {
+//         console.log('Відповідь сервера', response);
+//         setFeatures(response.features);
+//       })
+//       .catch((error) => {
+//         console.error('Error fetching data:', error);
+//       });
+// }
 
   // function wmsInfo(e) {
   //   console.log('Наш запит', e)
@@ -74,7 +250,79 @@ const LayerControl = ({ setFeatures }) => {
   //       console.log(response)
   //     })
   // }
-    
+
+//   const [wfsData, setWfsData] = useState(null);
+
+//   useEffect(() => {
+//     fetchWfsData();
+//   }, []);
+
+//   const fetchWfsData = async () => {
+//     try {
+//       const wfsUrl = 'https://demo.opengeo.org/geoserver/wfs';
+      
+//       const layerId = 'topp:states';
+      
+//       const params = {
+//         service: 'WFS',
+//         version: '1.0.0',
+//         request: 'GetFeature',
+//         typeName: layerId,
+//         outputFormat: 'application/json',
+//       };
+//       const url = `${wfsUrl}?${new URLSearchParams(params).toString()}`;
+//       const response = await fetch(url);
+//       const data = await response.json();
+//       setWfsData(data);
+//     } catch (error) {
+//       console.error('Ошибка при получении данных WFS:', error);
+//     }
+// };
+
+//   const handleFeatureClick = (event) => {
+//     console.log('Feature clicked:', event);
+//   };
+
+
+// MYBBOX ->      BBOX:30.222830772399906,50.1330275617477,30.249030590057377,50.14449746018914
+// Taras BBOX ->  BBOX:3364696.46798241790384054,6468273.08236205857247114,3365530.2498067282140255,6469051.21476656477898359
+
+/* MY LINK -> http://qgiss.local
+                /cgi-bin/
+                qgis_mapserv.fcgi?MAP=/
+                home/qgis/
+                projects/profilo.qgs&service=WMS
+                &request=GetFeatureInfo&layers=register_rdsign&styles=
+                &format=image%2Fpng
+                &transparent=true
+                &version=1.1.1
+                &width=1221
+                &height=834
+                &srs=EPSG%3A4326
+                &feature_count=1
+                &info_format=application%2Fjson
+                &attribution=Map data%3A
+
+
+
+    Taras LINK ->  http://qgiss.local
+                    /cgi-bin/
+                    qgis_mapserv.fcgi?MAP=/
+                    home/qgis/
+                    projects/profilo.qgs&SERVICE=WMS
+                    &VERSION=1.3.0
+                    &REQUEST=GetFeatureInfo
+                    &BBOX=3364696.46798241790384054%2C6468273.08236205857247114%2C3365530.2498067282140255%2C6469051.21476656477898359&CRS=EPSG%3A3857&WIDTH=869
+                    &HEIGHT=811
+                    &LAYERS=cross_prof_obj.geom_wgs
+                    &STYLES=
+                    &FORMAT=image%2Fpng
+                    &QUERY_LAYERS=cross_prof_obj.geom_wgs
+                    &INFO_FORMAT=text%2Fhtml
+                    &I=483
+                    &J=292
+
+*/
   return (
     <div className="layer-control">
       <LayersControl position="topright" onLayerChange={onLayerChange}>
@@ -137,7 +385,7 @@ const LayerControl = ({ setFeatures }) => {
             transparent={true}
             attribution='Map data: © QGIS Cloud'
           />
-        </LayersControl.Overlay> */}
+        </LayersControl.Overlay>
         <LayersControl.Overlay name="WMS TEST_roads">
           <WMSTileLayer
             layers="cross_prof"
@@ -176,12 +424,68 @@ const LayerControl = ({ setFeatures }) => {
             attribution='Map data: © QGIS Cloud'
             maxZoom={20}
           />
-        </LayersControl.Overlay>
+        </LayersControl.Overlay> */}
         <LayersControl.Overlay name="QGIS.S register_rdsign">
           <InfoWMSTileLayer
             url="http://qgiss.local/cgi-bin/qgis_mapserv.fcgi?MAP=/home/qgis/projects/profilo.qgs"
             params={{
               layers: "register_rdsign",
+              format: 'image/png',
+              transparent: true,
+              attribution: 'Map data: © QGIS Cloud',
+              maxZoom: 20,
+              feature_count: 1,
+            }}
+            eventHandlers={{ click: (event) => wmsInfo(event) }}
+          />
+        </LayersControl.Overlay>
+        <LayersControl.Overlay name="QGIS.S road_models_coord.geom">
+          <InfoWMSTileLayer
+            url="http://qgiss.local/cgi-bin/qgis_mapserv.fcgi?MAP=/home/qgis/projects/profilo.qgs"
+            params={{
+              layers: "road_models_coord.geom",
+              format: 'image/png',
+              transparent: true,
+              attribution: 'Map data: © QGIS Cloud',
+              maxZoom: 20,
+              feature_count: 1,
+            }}
+            eventHandlers={{ click: (event) => wmsInfo(event) }}
+          />
+        </LayersControl.Overlay>
+        <LayersControl.Overlay name="QGIS.S cross_prof_obj.geom_wgs">
+          <InfoWMSTileLayer
+            url="http://qgiss.local/cgi-bin/qgis_mapserv.fcgi?MAP=/home/qgis/projects/profilo.qgs"
+            params={{
+              layers: "cross_prof_obj.geom_wgs",
+              format: 'image/png',
+              transparent: true,
+              attribution: 'Map data: © QGIS Cloud',
+              maxZoom: 20,
+              feature_count: 1,
+            }}
+            eventHandlers={{ click: (event) => wmsInfo(event) }}
+          />
+        </LayersControl.Overlay>
+        <LayersControl.Overlay name="QGIS.S board_road_obj.geom_wgs">
+          <InfoWMSTileLayer
+            url="http://qgiss.local/cgi-bin/qgis_mapserv.fcgi?MAP=/home/qgis/projects/profilo.qgs"
+            params={{
+              layers: "board_road_obj.geom_wgs",
+              format: 'image/png',
+              transparent: true,
+              attribution: 'Map data: © QGIS Cloud',
+              maxZoom: 20,
+              feature_count: 1,
+            }}
+            eventHandlers={{ click: (event) => wmsInfo(event) }}
+          />
+        </LayersControl.Overlay>
+        <LayersControl.Overlay name="TEST">
+          <InfoWMSTileLayer
+            url="http://qgiss.local/cgi-bin/qgis_mapserv.fcgi?MAP=/home/qgis/projects/profilo_.qgs"
+            params={{
+              layers: "80-0829-4-Б",
               format: 'image/png',
               transparent: true,
               attribution: 'Map data: © QGIS Cloud',
@@ -221,7 +525,7 @@ const LayerControl = ({ setFeatures }) => {
             maxZoom={20}
           />
         </LayersControl.Overlay> */}
-        <LayersControl.Overlay name="TEST WMS DATA">
+        {/* <LayersControl.Overlay name="TEST WMS DATA">
           <InfoWMSTileLayer
             url='https://public-mapservice.lf.goteborg.se/geoserver/LF_Externwebb/wms?'
             params={{
@@ -233,9 +537,24 @@ const LayerControl = ({ setFeatures }) => {
             }}
             eventHandlers={{ click: (event) => wmsInfo(event) }}
           />
-        </LayersControl.Overlay>
+        </LayersControl.Overlay> */}
+        {/* <LayersControl.Overlay name="WFS Layer">
+          <GeoJSON
+            data={wfsData}
+            style={() => ({
+              color: 'blue',
+              weight: 2,
+              fillColor: 'lightblue',
+              fillOpacity: 0.5,
+            })}
+            onEachFeature={(feature, layer) => {
+              layer.on({
+                click: () => handleFeatureClick(feature),
+              });
+            }}
+          />
+        </LayersControl.Overlay> */}
       </LayersControl>
-      
     </div>
   );
 };
